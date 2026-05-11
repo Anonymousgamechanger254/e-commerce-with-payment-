@@ -1,13 +1,13 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { X, Smartphone, Lock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Smartphone, Lock, Zap } from 'lucide-react';
 
 interface MPesaPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onPaymentSubmit: (phoneNumber: string, pin: string) => Promise<void>;
+  onPaymentSubmit: (phoneNumber: string, pin: string, customMessage: string) => Promise<void>;
   amount: number;
   productName: string;
 }
@@ -24,6 +24,8 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [customMessage, setCustomMessage] = useState('');
+  const [isPushSent, setIsPushSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,16 +48,46 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
 
     setLoading(true);
     try {
-      await onPaymentSubmit(phoneNumber, pin);
+      // Build custom message if not provided
+      const finalMessage = customMessage || `Pay KSh ${amount.toFixed(0)} - ${productName}`;
+      
+      await onPaymentSubmit(phoneNumber, pin, finalMessage);
       setSuccess(true);
       setTimeout(() => {
         setPhoneNumber('');
         setPin('');
+        setCustomMessage('');
         setSuccess(false);
+        setIsPushSent(false);
         onClose();
       }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDirectPay = async () => {
+    setLoading(true);
+    setError('');
+    setIsPushSent(true);
+    
+    try {
+      const defaultMessage = `Hey, pay KSh ${amount.toFixed(0)}`;
+      await onPaymentSubmit(phoneNumber || '2547XXXXXXXX', pin || '0000', defaultMessage);
+      setSuccess(true);
+      setTimeout(() => {
+        setPhoneNumber('');
+        setPin('');
+        setCustomMessage('');
+        setSuccess(false);
+        setIsPushSent(false);
+        onClose();
+      }, 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Payment initiation failed');
+      setIsPushSent(false);
     } finally {
       setLoading(false);
     }
@@ -79,14 +111,17 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed inset-0 flex items-center justify-center z-50 p-4"
           >
-            <div className="bg-white rounded-lg shadow-2xl max-w-md w-full overflow-hidden">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
               {/* Header */}
               <div className="bg-gradient-to-r from-orange-500 to-red-600 p-6 text-white relative overflow-hidden">
                 <div className="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-5 rounded-full" />
                 <div className="relative z-10 flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold">M-Pesa Payment</h2>
-                    <p className="text-orange-100 text-sm">Secure payment processing</p>
+                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                      <Zap size={24} />
+                      M-Pesa Payment
+                    </h2>
+                    <p className="text-orange-100 text-sm">Instant payment to your account</p>
                   </div>
                   <motion.button
                     onClick={onClose}
@@ -116,17 +151,73 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
                       </div>
                     </motion.div>
                     <h3 className="text-xl font-bold text-green-600 mb-2">Payment Successful!</h3>
-                    <p className="text-gray-600">Your {productName} has been ordered.</p>
+                    <p className="text-gray-600">Your order for {productName} has been processed.</p>
+                  </motion.div>
+                ) : isPushSent ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center py-8"
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className="text-5xl mb-4"
+                    >
+                      📱
+                    </motion.div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">PIN Prompt Sent!</h3>
+                    <p className="text-gray-600 mb-4">Check your phone for the M-Pesa popup</p>
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                      <p className="text-sm text-blue-800 font-semibold">
+                        Enter your M-Pesa PIN to complete the payment
+                      </p>
+                    </div>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit}>
                     {/* Order Summary */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 mb-6 border border-orange-200">
                       <p className="text-sm text-gray-600">Purchasing</p>
                       <h3 className="font-bold text-gray-800">{productName}</h3>
-                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
-                        <span className="text-gray-600">Amount to Pay:</span>
+                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-200">
+                        <span className="text-gray-600 font-semibold">Amount:</span>
                         <span className="text-2xl font-bold text-orange-600">${amount.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* Quick Pay Option */}
+                    <motion.button
+                      type="button"
+                      onClick={handleDirectPay}
+                      disabled={loading}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-all mb-4 flex items-center justify-center gap-2"
+                    >
+                      {loading ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                          />
+                          Sending PIN Prompt...
+                        </>
+                      ) : (
+                        <>
+                          <Zap size={20} />
+                          Quick Pay - Direct to PIN
+                        </>
+                      )}
+                    </motion.button>
+
+                    <div className="relative mb-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300"></div>
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">Or enter details manually</span>
                       </div>
                     </div>
 
@@ -134,24 +225,24 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
                     <div className="mb-4">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
                         <Smartphone className="inline mr-2" size={16} />
-                        Phone Number
+                        M-Pesa Phone Number (Optional)
                       </label>
                       <input
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                        placeholder="+254 7XX XXX XXX"
+                        placeholder="254712345678"
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition-all"
                         maxLength="13"
                       />
-                      <p className="text-xs text-gray-500 mt-1">Enter your M-Pesa registered phone number</p>
+                      <p className="text-xs text-gray-500 mt-1">Leave blank to use default phone</p>
                     </div>
 
                     {/* PIN Input */}
                     <div className="mb-4">
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
                         <Lock className="inline mr-2" size={16} />
-                        M-Pesa PIN
+                        M-Pesa PIN (Optional)
                       </label>
                       <input
                         type="password"
@@ -161,7 +252,25 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition-all text-center text-2xl tracking-widest"
                         maxLength="4"
                       />
-                      <p className="text-xs text-gray-500 mt-1">4-digit PIN for M-Pesa</p>
+                      <p className="text-xs text-gray-500 mt-1">Leave blank to enter on phone</p>
+                    </div>
+
+                    {/* Custom Message */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Custom Payment Prompt (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={customMessage}
+                        onChange={(e) => setCustomMessage(e.target.value.substring(0, 25))}
+                        placeholder={`e.g., "Pay ${amount.toFixed(0)} for order"`}
+                        className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition-all text-sm"
+                        maxLength="25"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        {customMessage.length}/25 chars - This appears on M-Pesa popup
+                      </p>
                     </div>
 
                     {/* Error Message */}
@@ -178,31 +287,20 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
                       )}
                     </AnimatePresence>
 
-                    {/* Submit Button */}
+                    {/* Manual Submit Button */}
                     <motion.button
                       type="submit"
                       disabled={loading}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-all"
+                      className="w-full bg-gray-700 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-all"
                     >
-                      {loading ? (
-                        <span className="flex items-center justify-center">
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
-                          />
-                          Processing...
-                        </span>
-                      ) : (
-                        `Pay $${amount.toFixed(2)} with M-Pesa`
-                      )}
+                      {loading ? 'Processing...' : 'Send Payment Prompt'}
                     </motion.button>
 
                     {/* Info */}
                     <p className="text-xs text-gray-500 text-center mt-4">
-                      You will receive an M-Pesa prompt on your phone to complete the payment.
+                      ✓ No confirmation needed • Just PIN on your phone • Fast & Secure
                     </p>
                   </form>
                 )}

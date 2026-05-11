@@ -15,7 +15,7 @@ export const products: Product[] = [
     name: "Premium Wireless Headphones",
     description: "High-quality sound with active noise cancellation, 30-hour battery life, and premium comfort.",
     price: 299.99,
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop",
     category: "Electronics",
     rating: 4.8,
     reviews: 2543
@@ -35,7 +35,7 @@ export const products: Product[] = [
     name: "Smartphone Pro",
     description: "Latest flagship smartphone with advanced camera system and blazing-fast processor.",
     price: 999.99,
-    image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1511707267537-b85faf00021e?w=500&h=500&fit=crop",
     category: "Electronics",
     rating: 4.7,
     reviews: 5421
@@ -55,7 +55,7 @@ export const products: Product[] = [
     name: "Professional Camera",
     description: "Full-frame DSLR camera with 4K video recording and advanced autofocus system.",
     price: 1999.99,
-    image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=500&h=500&fit=crop",
     category: "Electronics",
     rating: 4.9,
     reviews: 2134
@@ -85,7 +85,7 @@ export const products: Product[] = [
     name: "Wireless Speaker",
     description: "Portable premium Bluetooth speaker with 360-degree sound and waterproof design.",
     price: 199.99,
-    image: "https://images.unsplash.com/photo-1589003077984-894fdbb6d1b6?w=500&h=500&fit=crop",
+    image: "https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=500&h=500&fit=crop",
     category: "Electronics",
     rating: 4.6,
     reviews: 2876
