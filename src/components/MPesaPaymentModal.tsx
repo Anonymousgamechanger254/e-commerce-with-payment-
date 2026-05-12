@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { X, Smartphone, Lock, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { X, Smartphone, Lock, Zap, CheckCircle } from 'lucide-react';
 
 interface MPesaPaymentModalProps {
   isOpen: boolean;
@@ -19,12 +19,11 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
   amount,
   productName
 }) => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('254');
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [customMessage, setCustomMessage] = useState('');
   const [isPushSent, setIsPushSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,15 +47,12 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
 
     setLoading(true);
     try {
-      // Build custom message if not provided
-      const finalMessage = customMessage || `Pay KSh ${amount.toFixed(0)} - ${productName}`;
-      
+      const finalMessage = `Pay KSh ${Math.round(amount)} - ${productName}`;
       await onPaymentSubmit(phoneNumber, pin, finalMessage);
       setSuccess(true);
       setTimeout(() => {
-        setPhoneNumber('');
+        setPhoneNumber('254');
         setPin('');
-        setCustomMessage('');
         setSuccess(false);
         setIsPushSent(false);
         onClose();
@@ -74,8 +70,8 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
     setIsPushSent(true);
     
     try {
-      const defaultMessage = `Hey, pay KSh ${amount.toFixed(0)}`;
-      await onPaymentSubmit(phoneNumber || '2547XXXXXXXX', pin || '0000', defaultMessage);
+      const defaultMessage = `Pay KSh ${Math.round(amount)} - ${productName}`;
+      await onPaymentSubmit('254712345678', '0000', defaultMessage);
       setSuccess(true);
       setTimeout(() => {
         setPhoneNumber('');
@@ -182,7 +178,7 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
                       <h3 className="font-bold text-gray-800">{productName}</h3>
                       <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-200">
                         <span className="text-gray-600 font-semibold">Amount:</span>
-                        <span className="text-2xl font-bold text-orange-600">${amount.toFixed(2)}</span>
+                        <span className="text-2xl font-bold text-orange-600">KSh {Math.round(amount).toLocaleString()}</span>
                       </div>
                     </div>
 
@@ -253,24 +249,6 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
                         maxLength="4"
                       />
                       <p className="text-xs text-gray-500 mt-1">Leave blank to enter on phone</p>
-                    </div>
-
-                    {/* Custom Message */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Custom Payment Prompt (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={customMessage}
-                        onChange={(e) => setCustomMessage(e.target.value.substring(0, 25))}
-                        placeholder={`e.g., "Pay ${amount.toFixed(0)} for order"`}
-                        className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition-all text-sm"
-                        maxLength="25"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        {customMessage.length}/25 chars - This appears on M-Pesa popup
-                      </p>
                     </div>
 
                     {/* Error Message */}

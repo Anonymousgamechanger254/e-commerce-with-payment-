@@ -78,7 +78,7 @@ export default function Home() {
       setTimeout(() => {
         console.log(`Processing M-Pesa payment:`);
         console.log(`  Phone: ${phoneNumber}`);
-        console.log(`  Amount: $${totalAmount}`);
+        console.log(`  Amount: KSh ${totalAmount}`);
         console.log(`  Custom Message: ${customMessage}`);
         
         // In production, you would call your backend API here:
@@ -98,6 +98,11 @@ export default function Home() {
         resolve(undefined);
       }, 2000);
     });
+  };
+
+  const handleBuyNow = (product: Product) => {
+    setSelectedProduct(product);
+    setIsMPesaModalOpen(true);
   };
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -145,7 +150,7 @@ export default function Home() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-all"
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition-all"
               />
             </motion.div>
 
@@ -166,8 +171,8 @@ export default function Home() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-6 py-2 rounded-full font-semibold transition-all ${
                     selectedCategory === category
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-purple-600'
+                      ? 'bg-orange-600 text-white shadow-lg'
+                      : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-orange-600'
                   }`}
                 >
                   {category}
@@ -184,6 +189,7 @@ export default function Home() {
                   key={product.id}
                   product={product}
                   onAddToCart={handleAddToCart}
+                  onBuyNow={handleBuyNow}
                   index={index}
                 />
               ))

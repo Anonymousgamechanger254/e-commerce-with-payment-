@@ -13,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({ cartItemCount, onCartClick }) =>
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="bg-gradient-to-r from-purple-600 to-pink-600 text-white sticky top-0 z-20 shadow-lg">
+    <header className="bg-gradient-to-r from-orange-500 to-orange-600 text-white sticky top-0 z-20 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -28,11 +28,11 @@ export const Header: React.FC<HeaderProps> = ({ cartItemCount, onCartClick }) =>
                 transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                 className="w-10 h-10 bg-white rounded-full opacity-20"
               />
-              <div className="absolute inset-0 flex items-center justify-center font-bold text-xl">⚡</div>
+              <div className="absolute inset-0 flex items-center justify-center font-bold text-xl">🛍️</div>
             </div>
             <div>
               <h1 className="text-2xl font-bold">LuxeStore</h1>
-              <p className="text-xs text-purple-200">Premium Marketplace</p>
+              <p className="text-xs text-orange-100">Premium Marketplace - M-Pesa Payments</p>
             </div>
           </motion.div>
 
@@ -41,21 +41,21 @@ export const Header: React.FC<HeaderProps> = ({ cartItemCount, onCartClick }) =>
             <motion.a
               href="#"
               whileHover={{ y: -2 }}
-              className="text-white hover:text-purple-200 transition-all font-semibold"
+              className="text-white hover:text-orange-100 transition-all font-semibold"
             >
               Home
             </motion.a>
             <motion.a
               href="#products"
               whileHover={{ y: -2 }}
-              className="text-white hover:text-purple-200 transition-all font-semibold"
+              className="text-white hover:text-orange-100 transition-all font-semibold"
             >
               Products
             </motion.a>
             <motion.a
               href="#"
               whileHover={{ y: -2 }}
-              className="text-white hover:text-purple-200 transition-all font-semibold"
+              className="text-white hover:text-orange-100 transition-all font-semibold"
             >
               About
             </motion.a>
