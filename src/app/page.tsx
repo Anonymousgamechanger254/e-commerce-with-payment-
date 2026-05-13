@@ -19,6 +19,7 @@ export default function Home() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMPesaModalOpen, setIsMPesaModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isBuyNow, setIsBuyNow] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const productsRef = useRef<HTMLDivElement>(null);
@@ -66,47 +67,60 @@ export default function Home() {
       return;
     }
 
-    // For demo, we'll charge for the first item
     setSelectedProduct(cartItems[0]);
+    setIsBuyNow(false);
     setIsCartOpen(false);
     setIsMPesaModalOpen(true);
   };
 
   const handleMPesaPayment = async (phoneNumber: string, pin: string, customMessage: string) => {
-    // Simulate payment processing with custom message
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        console.log(`Processing M-Pesa payment:`);
-        console.log(`  Phone: ${phoneNumber}`);
-        console.log(`  Amount: KSh ${totalAmount}`);
-        console.log(`  Custom Message: ${customMessage}`);
-        
-        // In production, you would call your backend API here:
-        // const response = await fetch('/api/mpesa/stk-push', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({
-        //     amount: totalAmount,
-        //     phone_number: phoneNumber,
-        //     custom_message: customMessage,
-        //     account_reference: 'PURCHASE-' + Date.now()
-        //   })
-        // });
-        
-        // For demo: simulate successful payment
-        setCartItems([]);
-        resolve(undefined);
-      }, 2000);
+    const paymentAmount = selectedProduct
+      ? isBuyNow
+        ? selectedProduct.price
+        : Math.round(totalAmount * 1.1)
+      : totalAmount;
+
+    const response = await fetch('/api/mpesa/stk-push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: paymentAmount,
+        phone_number: phoneNumber,
+        custom_message: customMessage,
+        account_reference: `LUXE-${selectedProduct?.id ?? 'ORDER'}-${Date.now()}`
+      })
     });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Payment request failed');
+    }
+
+    setCartItems([]);
+    return;
   };
 
   const handleBuyNow = (product: Product) => {
     setSelectedProduct(product);
+    setIsBuyNow(true);
     setIsMPesaModalOpen(true);
   };
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const paymentAmount = selectedProduct
+    ? isBuyNow
+      ? selectedProduct.price
+      : Math.round(totalAmount * 1.1)
+    : 0;
+
+  const paymentLabel = selectedProduct
+    ? isBuyNow
+      ? selectedProduct.name
+      : `${cartItems.length} item(s)`
+    : '';
 
   return (
     <div className="min-h-screen bg-white">
@@ -255,6 +269,7 @@ export default function Home() {
           >
             <h3 className="text-2xl font-bold mb-2">LuxeStore</h3>
             <p className="text-purple-200 mb-4">Your destination for premium products</p>
+            <p className="text-sm text-purple-300 mb-2">Fast delivery, secure M-Pesa checkout, and support for every order.</p>
             <p className="text-sm text-purple-300">© 2026 LuxeStore. All rights reserved.</p>
           </motion.div>
         </div>
@@ -275,8 +290,8 @@ export default function Home() {
           isOpen={isMPesaModalOpen}
           onClose={() => setIsMPesaModalOpen(false)}
           onPaymentSubmit={handleMPesaPayment}
-          amount={totalAmount * 1.1}
-          productName={`${cartItems.length} item(s)`}
+          amount={paymentAmount}
+          productName={paymentLabel}
         />
       )}
     </div>

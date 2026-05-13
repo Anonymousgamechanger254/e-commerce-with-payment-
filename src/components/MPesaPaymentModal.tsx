@@ -169,7 +169,7 @@ export const MPesaPaymentModal: React.FC<MPesaPaymentModalProps> = ({
                         onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                         placeholder="254712345678"
                         className="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:border-orange-600 focus:outline-none transition-all text-lg font-semibold"
-                        maxLength="13"
+                        maxLength={13}
                         autoFocus
                       />
                       <p className="text-xs text-gray-500 mt-2">
