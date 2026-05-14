@@ -258,20 +258,126 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gradient-to-r from-purple-900 to-pink-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+      {/* Testimonials Section */}
+      <section className="py-20 px-4 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
+            className="text-center mb-16"
           >
-            <h3 className="text-2xl font-bold mb-2">LuxeStore</h3>
-            <p className="text-purple-200 mb-4">Your destination for premium products</p>
-            <p className="text-sm text-purple-300 mb-2">Fast delivery, secure M-Pesa checkout, and support for every order.</p>
-            <p className="text-sm text-purple-300">© 2026 LuxeStore. All rights reserved.</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">What Customers Say</h2>
+            <p className="text-xl text-gray-600">Join thousands of happy customers who trust LuxeStore</p>
           </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                name: 'Sarah M.',
+                rating: 5,
+                comment: 'Amazing products and super fast delivery! The M-Pesa payment was so easy.'
+              },
+              {
+                name: 'James K.',
+                rating: 5,
+                comment: 'Best online store in Kenya. Quality is excellent and prices are fair.'
+              },
+              {
+                name: 'Diana P.',
+                rating: 5,
+                comment: 'Very satisfied with my purchase. Highly recommend LuxeStore to everyone!'
+              }
+            ].map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.2 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-lg p-8 shadow-md hover:shadow-lg transition-all border-l-4 border-orange-500"
+              >
+                <div className="flex items-center mb-4">
+                  <div className="text-yellow-400 flex gap-1">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <span key={i}>⭐</span>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-4 italic">"{testimonial.comment}"</p>
+                <p className="font-bold text-gray-900">— {testimonial.name}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gradient-to-r from-purple-900 to-pink-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-2xl font-bold mb-2">LuxeStore</h3>
+              <p className="text-purple-200">Your destination for premium products</p>
+            </motion.div>
+
+            {/* Quick Links */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <h4 className="font-bold mb-3">Quick Links</h4>
+              <ul className="space-y-2 text-purple-200">
+                <li><a href="#products" className="hover:text-white transition-all">Shop Now</a></li>
+                <li><a href="#products" className="hover:text-white transition-all">Categories</a></li>
+                <li><a href="#" className="hover:text-white transition-all">About Us</a></li>
+              </ul>
+            </motion.div>
+
+            {/* Support */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <h4 className="font-bold mb-3">Support</h4>
+              <ul className="space-y-2 text-purple-200">
+                <li><a href="#" className="hover:text-white transition-all">Contact Us</a></li>
+                <li><a href="#" className="hover:text-white transition-all">FAQ</a></li>
+                <li><a href="#" className="hover:text-white transition-all">Returns</a></li>
+              </ul>
+            </motion.div>
+
+            {/* Social Links */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <h4 className="font-bold mb-3">Follow Us</h4>
+              <div className="flex gap-4">
+                <a href="#" className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center hover:bg-orange-500 transition-all">📘</a>
+                <a href="#" className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center hover:bg-orange-500 transition-all">𝕏</a>
+                <a href="#" className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center hover:bg-orange-500 transition-all">📷</a>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="border-t border-purple-700 pt-8 text-center">
+            <p className="text-purple-300 mb-2">Fast delivery, secure M-Pesa checkout, and support for every order.</p>
+            <p className="text-sm text-purple-300">© 2026 LuxeStore. All rights reserved. | Privacy Policy | Terms & Conditions</p>
+          </div>
         </div>
       </footer>
 
