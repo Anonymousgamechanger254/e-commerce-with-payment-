@@ -7,6 +7,7 @@ import { Hero } from '@/components/Hero';
 import { ProductCard } from '@/components/ProductCard';
 import { Cart } from '@/components/Cart';
 import { MPesaPaymentModal } from '@/components/MPesaPaymentModal';
+import { Toast } from '@/components/Toast';
 import { products, Product } from '@/data/products';
 import { Filter, Search } from 'lucide-react';
 
@@ -22,6 +23,8 @@ export default function Home() {
   const [isBuyNow, setIsBuyNow] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
   const productsRef = useRef<HTMLDivElement>(null);
 
   const categories = ['All', 'Electronics', 'Accessories', 'Fashion'];
@@ -37,12 +40,16 @@ export default function Home() {
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
+        setToastMessage(`✅ Updated ${product.name} in cart`);
         return prevItems.map(item =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
+      setToastMessage(`✅ Added ${product.name} to cart`);
       return [...prevItems, { ...product, quantity: 1 }];
     });
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   const handleRemoveFromCart = (productId: number) => {
@@ -124,6 +131,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
+      <Toast message={toastMessage} isVisible={showToast} onClose={() => setShowToast(false)} />
       <Header cartItemCount={cartItemCount} onCartClick={() => setIsCartOpen(true)} />
 
       {/* Hero Section */}
